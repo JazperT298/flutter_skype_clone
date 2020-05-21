@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterskypeclone/resources/firebase_repository.dart';
 import 'package:flutterskypeclone/screens/home_screen.dart';
 import 'package:flutterskypeclone/screens/login_screen.dart';
+import 'package:flutterskypeclone/screens/search_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -28,6 +29,10 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      initialRoute: '/',
+      routes: {
+        '/search_screen': (context) => SearchScreen(),
+      },
       home: FutureBuilder(
         future: _repository.getCurrentUser(),
         builder: (context, AsyncSnapshot<FirebaseUser> snapshot){
