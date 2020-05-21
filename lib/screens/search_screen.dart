@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterskypeclone/models/user.dart';
 import 'package:flutterskypeclone/resources/firebase_repository.dart';
+import 'package:flutterskypeclone/screens/chat_screen.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:flutterskypeclone/widgets/custom_tile.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
@@ -111,7 +112,9 @@ class _SearchScreenState extends State<SearchScreen> {
         );
         return CustomTile(
           mini: false,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(receiver: searcedUser)));
+          },
           leading: CircleAvatar(
             backgroundImage: NetworkImage(
                 searcedUser.profilePhoto

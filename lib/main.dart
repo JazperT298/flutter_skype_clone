@@ -27,7 +27,8 @@ class _MyAppState extends State<MyApp> {
       title: "Skype Clone",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        //primarySwatch: Colors.blue,
       ),
       initialRoute: '/',
       routes: {
