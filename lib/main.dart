@@ -7,8 +7,14 @@ import 'package:flutterskypeclone/screens/login_screen.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  FirebaseRepository _repository = FirebaseRepository();
   @override
   Widget build(BuildContext context) {
 
@@ -16,7 +22,6 @@ class MyApp extends StatelessWidget {
 //      "name":"metalman"
 //    });
 
-    FirebaseRepository _repository = FirebaseRepository();
     return MaterialApp(
       title: "Skype Clone",
       debugShowCheckedModeBanner: false,
