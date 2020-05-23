@@ -38,7 +38,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         onPressed: () {} ,
       ),
       title: UserCircle(initials),
-      centerTile: true,
+      centerTitle: true,
       actions: <Widget>[
         IconButton(
           icon: Icon(

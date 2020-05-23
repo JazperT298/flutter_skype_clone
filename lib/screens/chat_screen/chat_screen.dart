@@ -12,6 +12,7 @@ import 'package:flutterskypeclone/models/user.dart';
 import 'package:flutterskypeclone/provider/image_upload_provider.dart';
 import 'package:flutterskypeclone/resources/firebase_repository.dart';
 import 'package:flutterskypeclone/screens/chat_screen/widgets/cached_image.dart';
+import 'package:flutterskypeclone/utils/call_utilities.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:flutterskypeclone/utils/utilities.dart';
 import 'package:flutterskypeclone/widgets/appbar.dart';
@@ -323,7 +324,6 @@ class _ChatScreenState extends State<ChatScreen> {
       _repository.addMessageToDb(_message,sender,widget.receiver);
     }
 
-
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Row(
@@ -456,7 +456,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Navigator.pop(context);
         },
       ),
-      centerTile: false,
+      centerTitle: false,
       title: Text(
         widget.receiver.name,
       ),
@@ -465,7 +465,13 @@ class _ChatScreenState extends State<ChatScreen> {
           icon: Icon(
             Icons.video_call
           ),
-          onPressed: () {},
+          onPressed: () {
+            CallUtils.dial(
+              from: sender,
+              to: widget.receiver,
+              context: context
+            );
+          },
         ),
         IconButton(
           icon: Icon(

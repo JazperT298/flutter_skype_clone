@@ -5,6 +5,8 @@ import 'package:flutterskypeclone/models/call.dart';
 class CallMethods {
   final CollectionReference  callCollection = Firestore.instance.collection(CALL_CONNECTION);
 
+  Stream<DocumentSnapshot> callStream({String uid}) => callCollection.document(uid).snapshots();
+
   Future<bool> makeCall({Call call}) async {
     try {
       call.hasDialled = true;

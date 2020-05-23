@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterskypeclone/provider/image_upload_provider.dart';
+import 'package:flutterskypeclone/provider/user_provider.dart';
 import 'package:flutterskypeclone/resources/firebase_repository.dart';
 import 'package:flutterskypeclone/screens/home_screen.dart';
 import 'package:flutterskypeclone/screens/login_screen.dart';
@@ -25,8 +26,11 @@ class _MyAppState extends State<MyApp> {
 //      "name":"metalman"
 //    });
 
-    return ChangeNotifierProvider<ImageUploadProvider>(
-      create: (context) => ImageUploadProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ImageUploadProvider(),),
+        ChangeNotifierProvider(create: (_) => UserProvider(),)
+      ],
       child: MaterialApp(
         title: "Skype Clone",
         debugShowCheckedModeBanner: false,

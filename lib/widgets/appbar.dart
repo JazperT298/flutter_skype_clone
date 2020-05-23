@@ -6,9 +6,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final Widget title;
   final List<Widget> actions;
   final Widget leading;
-  final bool centerTile;
+  final bool centerTitle;
 
-  const CustomAppBar({Key key, this.title, this.actions, this.leading, this.centerTile}) : super(key: key);
+  const CustomAppBar({Key key, this.title, this.actions, this.leading, this.centerTitle}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
         elevation: 0,
         leading: leading,
         actions: actions,
-        centerTitle: centerTile,
+        centerTitle: centerTitle,
         title: title,
       ),
     );
