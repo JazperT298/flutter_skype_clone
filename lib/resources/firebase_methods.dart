@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutterskypeclone/constants/strings.dart';
 import 'package:flutterskypeclone/models/message.dart';
 import 'package:flutterskypeclone/models/user.dart';
+import 'package:flutterskypeclone/provider/image_upload_provider.dart';
 import 'package:flutterskypeclone/utils/utilities.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -118,8 +119,13 @@ class FirebaseMethods{
     await firestore.collection(MESSAGES_COLLECTION).document(_message.receiverId).collection(_message.senderId).add(map);
   }
 
-  void uploadImage(File image, String receiverId, String senderId) async {
+  void uploadImage(File image, String receiverId, String senderId, ImageUploadProvider imageUploadProvider) async {
+    //set some loading value to db and show it to user
+    imageUploadProvider.setToLoading();
+    //get url from the image bucket
     String url = await uploadImageToStorage(image);
+    //hide loading
+    imageUploadProvider.setToIdle();
 
     setImageMessage(url, receiverId, senderId);
   }

@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterskypeclone/provider/image_upload_provider.dart';
 import 'package:flutterskypeclone/resources/firebase_repository.dart';
 import 'package:flutterskypeclone/screens/home_screen.dart';
 import 'package:flutterskypeclone/screens/login_screen.dart';
 import 'package:flutterskypeclone/screens/search_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -23,26 +25,29 @@ class _MyAppState extends State<MyApp> {
 //      "name":"metalman"
 //    });
 
-    return MaterialApp(
-      title: "Skype Clone",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        //primarySwatch: Colors.blue,
-      ),
-      initialRoute: '/',
-      routes: {
-        '/search_screen': (context) => SearchScreen(),
-      },
-      home: FutureBuilder(
-        future: _repository.getCurrentUser(),
-        builder: (context, AsyncSnapshot<FirebaseUser> snapshot){
-          if (snapshot.hasData){
-            return HomeScreen();
-          }else{
-            return LoginScreen();
-          }
+    return ChangeNotifierProvider<ImageUploadProvider>(
+      create: (context) => ImageUploadProvider(),
+      child: MaterialApp(
+        title: "Skype Clone",
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          //primarySwatch: Colors.blue,
+        ),
+        initialRoute: '/',
+        routes: {
+          '/search_screen': (context) => SearchScreen(),
         },
+        home: FutureBuilder(
+          future: _repository.getCurrentUser(),
+          builder: (context, AsyncSnapshot<FirebaseUser> snapshot){
+            if (snapshot.hasData){
+              return HomeScreen();
+            }else{
+              return LoginScreen();
+            }
+          },
+        ),
       ),
     );
   }
