@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,8 +10,10 @@ import 'package:flutterskypeclone/models/message.dart';
 import 'package:flutterskypeclone/models/user.dart';
 import 'package:flutterskypeclone/resources/firebase_repository.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
+import 'package:flutterskypeclone/utils/utilities.dart';
 import 'package:flutterskypeclone/widgets/appbar.dart';
 import 'package:flutterskypeclone/widgets/custom_tile.dart';
+import 'package:image_picker/image_picker.dart';
 class ChatScreen extends StatefulWidget {
   final User receiver;
   ChatScreen({this.receiver});
@@ -302,6 +306,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
       _repository.addMessageToDb(_message,sender,widget.receiver);
     }
+
+    pickCamera(@required ImageSource source) async{
+      File selectedImage = await Utils.pickImage(source: source);
+      _repository.uploadImage(
+        image: selectedImage,
+        receiverId: widget.receiver.uid,
+        senderId: _currentUserId,
+      );
+    }
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Row(
@@ -387,8 +400,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 Icons.record_voice_over
             ),
           ),
-          isWriting ? Container() : Icon(
-            Icons.camera_alt
+          isWriting ? Container() : GestureDetector(
+            onTap: () => pickCamera(ImageSource.camera),
+            child: Icon(
+              Icons.camera_alt
+            ),
           ),
           isWriting ? Container(
             margin: EdgeInsets.only(left: 10.0),
