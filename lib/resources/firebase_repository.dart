@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutterskypeclone/models/message.dart';
 import 'package:flutterskypeclone/models/user.dart';
 import 'package:flutterskypeclone/resources/firebase_methods.dart';
 
@@ -16,4 +17,7 @@ class FirebaseRepository{
   Future<void> signOut() => _firebaseMethods.signOut();
 
   Future<List<User>> fetchAllUsers(FirebaseUser user) => _firebaseMethods.fetchAllUsers(user);
+
+  Future<void> addMessageToDb(Message message, User sender, User receiver) =>
+      _firebaseMethods.addMessageToDb(message,sender,receiver);
 }
