@@ -5,7 +5,7 @@ class Message {
   String receiverId;
   String type;
   String message;
-  FieldValue timestamp;
+  Timestamp timestamp;
   String photoUrl;
 
   Message({this.senderId,this.receiverId,this.type,this.message,this.timestamp});
@@ -23,13 +23,12 @@ class Message {
     return map;
   }
 
-  Message fromMap(Map<String, dynamic> map){
-    Message _message = Message();
-    _message.senderId = map['senderId'];
-    _message.receiverId = map['receiverId'];
-    _message.type = map['type'];
-    _message.message = map['message'];
-    _message.timestamp = map['timestamp'];
-    return _message;
+  //Named Constructor
+  Message.fromMap(Map<String, dynamic> map){
+    this.senderId = map['senderId'];
+    this.receiverId = map['receiverId'];
+    this.type = map['type'];
+    this.message = map['message'];
+    this.timestamp = map['timestamp'];
   }
 }

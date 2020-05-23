@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutterskypeclone/constants/strings.dart';
 import 'package:flutterskypeclone/models/message.dart';
 import 'package:flutterskypeclone/models/user.dart';
 import 'package:flutterskypeclone/utils/utilities.dart';
@@ -33,7 +34,7 @@ class FirebaseMethods{
   }
 
   Future<bool> authenticateUser(FirebaseUser user) async{
-    QuerySnapshot result = await firestore.collection("users").where("email", isEqualTo: user.email).getDocuments();
+    QuerySnapshot result = await firestore.collection(USER_COLLECTION).where(EMAIL_FIELD, isEqualTo: user.email).getDocuments();
 
     final List<DocumentSnapshot> docs = result.documents;
 
@@ -51,7 +52,7 @@ class FirebaseMethods{
       profilePhoto: currentUser.photoUrl,
       username:username
     );
-    firestore.collection("users").document(currentUser.uid).setData(user.toMap(user));
+    firestore.collection(USER_COLLECTION).document(currentUser.uid).setData(user.toMap(user));
   }
 
   Future<void> signOut() async {
@@ -63,7 +64,7 @@ class FirebaseMethods{
   Future<List<User>> fetchAllUsers(FirebaseUser currentUser) async {
     List<User> userList = List<User>();
 
-    QuerySnapshot querySnapshot = await firestore.collection("users").getDocuments();
+    QuerySnapshot querySnapshot = await firestore.collection(USER_COLLECTION).getDocuments();
     for(var i = 0; i < querySnapshot.documents.length; i++){
       if(querySnapshot.documents[i].documentID != user.uid){
         userList.add(User.fromMap(querySnapshot.documents[i].data));
@@ -75,9 +76,9 @@ class FirebaseMethods{
   Future<void> addMessageToDb(Message message, User sender, User receiver) async {
     var map = message.toMap();
 
-    await firestore.collection("messages").document(message.senderId).collection(message.receiverId).add(map);
+    await firestore.collection(MESSAGE_COLLECTION).document(message.senderId).collection(message.receiverId).add(map);
 
-    await firestore.collection("messages").document(message.receiverId).collection(message.senderId).add(map);
+    await firestore.collection(MESSAGE_COLLECTION).document(message.receiverId).collection(message.senderId).add(map);
   }
 
 }
