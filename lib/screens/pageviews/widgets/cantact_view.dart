@@ -6,6 +6,8 @@ import 'package:flutterskypeclone/resources/auth_methods.dart';
 import 'package:flutterskypeclone/resources/chat_methods.dart';
 import 'package:flutterskypeclone/screens/chat_screen/chat_screen.dart';
 import 'package:flutterskypeclone/screens/chat_screen/widgets/cached_image.dart';
+import 'package:flutterskypeclone/screens/pageviews/widgets/last_message_container.dart';
+import 'package:flutterskypeclone/screens/pageviews/widgets/online_dot_indicator.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:flutterskypeclone/widgets/custom_tile.dart';
 import 'package:provider/provider.dart';
