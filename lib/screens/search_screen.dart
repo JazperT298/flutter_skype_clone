@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterskypeclone/models/user.dart';
-import 'package:flutterskypeclone/resources/firebase_repository.dart';
+import 'package:flutterskypeclone/resources/auth_methods.dart';
+import 'package:flutterskypeclone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:flutterskypeclone/screens/chat_screen/chat_screen.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:flutterskypeclone/widgets/custom_tile.dart';
@@ -13,8 +14,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-
-  FirebaseRepository _repository = FirebaseRepository();
+  final AuthMethods _authMethods = AuthMethods();
 
   List<User> userList;
   String query = "";
@@ -22,10 +22,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _repository.getCurrentUser().then((FirebaseUser user){
-      _repository.fetchAllUsers(user).then((List<User> list) {
+
+    _authMethods.getCurrentUser().then((FirebaseUser user) {
+      _authMethods.fetchAllUsers(user).then((List<User> list) {
         setState(() {
           userList = list;
         });
@@ -33,25 +33,26 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  searchAppBar(BuildContext context){
+  searchAppBar(BuildContext context) {
     return GradientAppBar(
-//      backgroundColorStart: UniversalVariables.gradientColorStart,
-//      backgroundColorEnd: UniversalVariables.gradientColorEnd,
+      gradient: LinearGradient(
+        colors: [
+          UniversalVariables.gradientColorStart,
+          UniversalVariables.gradientColorEnd,
+        ],
+      ),
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-        ),
+        icon: Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
       elevation: 0,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight + 20),
         child: Padding(
-          padding: EdgeInsets.only(left: 20.0),
+          padding: EdgeInsets.only(left: 20),
           child: TextField(
             controller: searchController,
-            onChanged: (val){
+            onChanged: (val) {
               setState(() {
                 query = val;
               });
@@ -61,23 +62,21 @@ class _SearchScreenState extends State<SearchScreen> {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
-              fontSize: 35.0
+              fontSize: 35,
             ),
             decoration: InputDecoration(
               suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.white,
-                ),
+                icon: Icon(Icons.close, color: Colors.white),
                 onPressed: () {
-                  WidgetsBinding.instance.addPostFrameCallback( (_) => searchController.clear());
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => searchController.clear());
                 },
               ),
               border: InputBorder.none,
               hintText: "Search",
               hintStyle: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 35.0,
+                fontSize: 35,
                 color: Color(0x88ffffff),
               ),
             ),
@@ -86,53 +85,58 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
-  buildSuggestions(String query){
+
+  buildSuggestions(String query) {
     final List<User> suggestionList = query.isEmpty
         ? []
-        : userList.where((User user) {
-            String _getUsername = user.username.toLowerCase();
-            String _query = query.toLowerCase();
-            String _getName = user.name.toLowerCase();
-            bool matchesUsername = _getUsername.contains(_query);
-            bool matchesName = _getName.contains(_query);
+        : userList != null
+        ? userList.where((User user) {
+      String _getUsername = user.username.toLowerCase();
+      String _query = query.toLowerCase();
+      String _getName = user.name.toLowerCase();
+      bool matchesUsername = _getUsername.contains(_query);
+      bool matchesName = _getName.contains(_query);
 
-            //(User user) => (user.username.toLowerCase().contains(query.toLowerCase()) ||
-            //   (user.name.toLowerCase().contains(query.toLowerCase())));
-            return (matchesUsername || matchesName);
-    }).toList();
+      return (matchesUsername || matchesName);
+
+      // (User user) => (user.username.toLowerCase().contains(query.toLowerCase()) ||
+      //     (user.name.toLowerCase().contains(query.toLowerCase()))),
+    }).toList()
+        : [];
 
     return ListView.builder(
       itemCount: suggestionList.length,
-      itemBuilder: ((context, index){
-        User searcedUser = User (
-          uid: suggestionList[index].uid,
-          profilePhoto: suggestionList[index].profilePhoto,
-          name: suggestionList[index].name,
-          username: suggestionList[index].username
-        );
+      itemBuilder: ((context, index) {
+        User searchedUser = User(
+            uid: suggestionList[index].uid,
+            profilePhoto: suggestionList[index].profilePhoto,
+            name: suggestionList[index].name,
+            username: suggestionList[index].username);
+
         return CustomTile(
           mini: false,
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(receiver: searcedUser)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      receiver: searchedUser,
+                    )));
           },
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(
-                searcedUser.profilePhoto
-            ),
+            backgroundImage: NetworkImage(searchedUser.profilePhoto),
             backgroundColor: Colors.grey,
           ),
           title: Text(
-            searcedUser.username,
+            searchedUser.username,
             style: TextStyle(
               color: Colors.white,
-              fontWeight: FontWeight.bold
+              fontWeight: FontWeight.bold,
             ),
           ),
           subtitle: Text(
-            searcedUser.name,
-            style: TextStyle(
-              color: UniversalVariables.greyColor
-            ),
+            searchedUser.name,
+            style: TextStyle(color: UniversalVariables.greyColor),
           ),
         );
       }),
@@ -141,12 +145,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: UniversalVariables.blackColor,
-      appBar: searchAppBar(context),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.0),
-        child: buildSuggestions(query),
+    return PickupLayout(
+      scaffold: Scaffold(
+        backgroundColor: UniversalVariables.blackColor,
+        appBar: searchAppBar(context),
+        body: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: buildSuggestions(query),
+        ),
       ),
     );
   }

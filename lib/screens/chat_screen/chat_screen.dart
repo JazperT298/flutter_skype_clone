@@ -10,53 +10,60 @@ import 'package:flutterskypeclone/enums/view_state.dart';
 import 'package:flutterskypeclone/models/message.dart';
 import 'package:flutterskypeclone/models/user.dart';
 import 'package:flutterskypeclone/provider/image_upload_provider.dart';
-import 'package:flutterskypeclone/resources/firebase_repository.dart';
+import 'package:flutterskypeclone/resources/auth_methods.dart';
+import 'package:flutterskypeclone/resources/chat_methods.dart';
+import 'package:flutterskypeclone/resources/storage_methods.dart';
+import 'package:flutterskypeclone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:flutterskypeclone/screens/chat_screen/widgets/cached_image.dart';
 import 'package:flutterskypeclone/utils/call_utilities.dart';
+import 'package:flutterskypeclone/utils/permissions.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:flutterskypeclone/utils/utilities.dart';
 import 'package:flutterskypeclone/widgets/appbar.dart';
 import 'package:flutterskypeclone/widgets/custom_tile.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
 class ChatScreen extends StatefulWidget {
   final User receiver;
+
   ChatScreen({this.receiver});
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  TextEditingController textFieldController = TextEditingController();
+  FocusNode textFieldFocus = FocusNode();
 
-  TextEditingController textEditingController = TextEditingController();
-  FirebaseRepository _repository = FirebaseRepository();
+  final StorageMethods _storageMethods = StorageMethods();
+  final ChatMethods _chatMethods = ChatMethods();
+  final AuthMethods _authMethods = AuthMethods();
 
   ScrollController _listScrollController = ScrollController();
 
-  ImageUploadProvider _imageUploadProvider = ImageUploadProvider();
-
-  FocusNode  textFieldFocus = FocusNode();
-
   User sender;
+
   String _currentUserId;
 
   bool isWriting = false;
 
   bool showEmojiPicker = false;
 
+  ImageUploadProvider _imageUploadProvider;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
-    _repository.getCurrentUser().then((user){
+    _authMethods.getCurrentUser().then((user) {
       _currentUserId = user.uid;
 
       setState(() {
         sender = User(
           uid: user.uid,
           name: user.displayName,
-          profilePhoto: user.photoUrl
+          profilePhoto: user.photoUrl,
         );
       });
     });
@@ -72,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  showEmojiContainer(){
+  showEmojiContainer() {
     setState(() {
       showEmojiPicker = true;
     });
@@ -82,31 +89,33 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
 
-    return Scaffold(
-      backgroundColor: UniversalVariables.blackColor,
-      appBar: customAppBar(context),
-      body: Column(
-        children: <Widget>[
-          Flexible(
-            child: messageList(),
-          ),
-          _imageUploadProvider.getViewState == ViewState.LOADING
-              ? Container(
-            alignment: Alignment.centerRight,
-            margin: EdgeInsets.only(right: 15.0),
-            child: CircularProgressIndicator(),
-          ) : Container(),
-          chatControls(),
-          showEmojiPicker ? Container(
-            child: emojiContainer(),
-          ): Container(),
-        ],
+    return PickupLayout(
+      scaffold: Scaffold(
+        backgroundColor: UniversalVariables.blackColor,
+        appBar: customAppBar(context),
+        body: Column(
+          children: <Widget>[
+            Flexible(
+              child: messageList(),
+            ),
+            _imageUploadProvider.getViewState == ViewState.LOADING
+                ? Container(
+              alignment: Alignment.centerRight,
+              margin: EdgeInsets.only(right: 15),
+              child: CircularProgressIndicator(),
+            )
+                : Container(),
+            chatControls(),
+            showEmojiPicker ? Container(child: emojiContainer()) : Container(),
+          ],
+        ),
       ),
     );
   }
+
   emojiContainer() {
     return EmojiPicker(
-      bgColor: UniversalVariables.senderColor,
+      bgColor: UniversalVariables.separatorColor,
       indicatorColor: UniversalVariables.blueColor,
       rows: 3,
       columns: 7,
@@ -115,36 +124,41 @@ class _ChatScreenState extends State<ChatScreen> {
           isWriting = true;
         });
 
-        textEditingController.text = textEditingController.text + emoji.emoji;
+        textFieldController.text = textFieldController.text + emoji.emoji;
       },
       recommendKeywords: ["face", "happy", "party", "sad"],
       numRecommended: 50,
     );
   }
 
-  Widget messageList(){
+  Widget messageList() {
     return StreamBuilder(
-      stream: Firestore.instance.collection(MESSAGES_COLLECTION).document(_currentUserId).collection(widget.receiver.uid).orderBy(TIMESTAMP_FIELD, descending: true).snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
-        if (snapshot.data == null){
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+      stream: Firestore.instance
+          .collection(MESSAGES_COLLECTION)
+          .document(_currentUserId)
+          .collection(widget.receiver.uid)
+          .orderBy(TIMESTAMP_FIELD, descending: true)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.data == null) {
+          return Center(child: CircularProgressIndicator());
         }
 
-//        SchedulerBinding.instance.addPostFrameCallback((_) {
-//          _listScrollController.animateTo(
-//              _listScrollController.position.minScrollExtent,
-//              duration: Duration(milliseconds: 250),
-//              curve: Curves.easeInOut,);
-//        });
+        // SchedulerBinding.instance.addPostFrameCallback((_) {
+        //   _listScrollController.animateTo(
+        //     _listScrollController.position.minScrollExtent,
+        //     duration: Duration(milliseconds: 250),
+        //     curve: Curves.easeInOut,
+        //   );
+        // });
 
         return ListView.builder(
-          padding: EdgeInsets.all(10.0),
-          itemCount: snapshot.data.documents.length,
-          reverse: true,
+          padding: EdgeInsets.all(10),
           controller: _listScrollController,
-          itemBuilder: (context, index){
+          reverse: true,
+          itemCount: snapshot.data.documents.length,
+          itemBuilder: (context, index) {
+            // mention the arrow syntax if you get the time
             return chatMessageItem(snapshot.data.documents[index]);
           },
         );
@@ -153,15 +167,17 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget chatMessageItem(DocumentSnapshot snapshot) {
-
     Message _message = Message.fromMap(snapshot.data);
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 15),
       child: Container(
         alignment: _message.senderId == _currentUserId
-          ? Alignment.centerRight : Alignment.centerLeft,
+            ? Alignment.centerRight
+            : Alignment.centerLeft,
         child: _message.senderId == _currentUserId
-          ? senderLayout(_message) : receiverLayout(_message),
+            ? senderLayout(_message)
+            : receiverLayout(_message),
       ),
     );
   }
@@ -188,52 +204,60 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  getMessage(Message message){
-
-    return message.type != MESSAGE_TYPE_IMAGE ? Text(
+  getMessage(Message message) {
+    return message.type != MESSAGE_TYPE_IMAGE
+        ? Text(
       message.message,
       style: TextStyle(
         color: Colors.white,
-        fontSize: 16.0
+        fontSize: 16.0,
       ),
-    ) : CachedImage(url: message.photoUrl);
+    )
+        : message.photoUrl != null
+        ? CachedImage(
+      message.photoUrl,
+      height: 250,
+      width: 250,
+      radius: 10,
+    )
+        : Text("Url was null");
   }
 
-  Widget receiverLayout(Message message){
-    Radius messageRadius = Radius.circular(10.0);
+  Widget receiverLayout(Message message) {
+    Radius messageRadius = Radius.circular(10);
 
     return Container(
-      margin: EdgeInsets.only(top: 12.0),
-      constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.65
-      ),
+      margin: EdgeInsets.only(top: 12),
+      constraints:
+      BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65),
       decoration: BoxDecoration(
         color: UniversalVariables.receiverColor,
         borderRadius: BorderRadius.only(
-            bottomRight: messageRadius,
-            topRight: messageRadius,
-            bottomLeft: messageRadius
+          bottomRight: messageRadius,
+          topRight: messageRadius,
+          bottomLeft: messageRadius,
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.all(10),
         child: getMessage(message),
       ),
     );
   }
 
   Widget chatControls() {
-    setWritingTo(bool val){
+    setWritingTo(bool val) {
       setState(() {
-        isWriting =  val;
+        isWriting = val;
       });
     }
-    addMediaModal(context){
+
+    addMediaModal(context) {
       showModalBottomSheet(
           context: context,
           elevation: 0,
           backgroundColor: UniversalVariables.blackColor,
-          builder: (context){
+          builder: (context) {
             return Column(
               children: <Widget>[
                 Container(
@@ -252,10 +276,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: Text(
                             "Content and tools",
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold
-                            ),
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -269,16 +292,16 @@ class _ChatScreenState extends State<ChatScreen> {
                         title: "Media",
                         subtitle: "Share Photos and Video",
                         icon: Icons.image,
-                        onTap: () => pickCamera(source: ImageSource.gallery),
+                        onTap: () => pickImage(source: ImageSource.gallery),
                       ),
                       ModalTile(
                         title: "File",
-                        subtitle: "Share Files",
+                        subtitle: "Share files",
                         icon: Icons.tab,
                       ),
                       ModalTile(
                         title: "Contact",
-                        subtitle: "Share Contacts",
+                        subtitle: "Share contacts",
                         icon: Icons.contacts,
                       ),
                       ModalTile(
@@ -293,20 +316,19 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       ModalTile(
                         title: "Create Poll",
-                        subtitle: "Share Poll",
+                        subtitle: "Share polls",
                         icon: Icons.poll,
-                      ),
+                      )
                     ],
                   ),
                 ),
               ],
             );
-          }
-      );
+          });
     }
 
-    sendMessage(){
-      var text = textEditingController.text;
+    sendMessage() {
+      var text = textFieldController.text;
 
       Message _message = Message(
         receiverId: widget.receiver.uid,
@@ -315,48 +337,49 @@ class _ChatScreenState extends State<ChatScreen> {
         timestamp: Timestamp.now(),
         type: 'text',
       );
+
       setState(() {
         isWriting = false;
       });
 
-      textEditingController.text = "";
+      textFieldController.text = "";
 
-      _repository.addMessageToDb(_message,sender,widget.receiver);
+      _chatMethods.addMessageToDb(_message, sender, widget.receiver);
     }
 
     return Container(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(10),
       child: Row(
         children: <Widget>[
           GestureDetector(
             onTap: () => addMediaModal(context),
             child: Container(
-              padding: EdgeInsets.all(5.0),
+              padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
                 gradient: UniversalVariables.fabGradient,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.add
-              ),
+              child: Icon(Icons.add),
             ),
           ),
           SizedBox(
-            width: 5.0,
+            width: 5,
           ),
           Expanded(
             child: Stack(
               alignment: Alignment.centerRight,
-              children: <Widget>[
+              children: [
                 TextField(
-                  controller: textEditingController,
+                  controller: textFieldController,
                   focusNode: textFieldFocus,
                   onTap: () => hideEmojiContainer(),
                   style: TextStyle(
-                      color: Colors.white
+                    color: Colors.white,
                   ),
-                  onChanged: (val){
-                    (val.length > 0 && val.trim() != "") ? setWritingTo(true) : setWritingTo(false);
+                  onChanged: (val) {
+                    (val.length > 0 && val.trim() != "")
+                        ? setWritingTo(true)
+                        : setWritingTo(false);
                   },
                   decoration: InputDecoration(
                     hintText: "Type a message",
@@ -367,90 +390,77 @@ class _ChatScreenState extends State<ChatScreen> {
                         borderRadius: const BorderRadius.all(
                           const Radius.circular(50.0),
                         ),
-                        borderSide: BorderSide.none
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 5.0
-                    ),
+                        borderSide: BorderSide.none),
+                    contentPadding:
+                    EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     filled: true,
                     fillColor: UniversalVariables.separatorColor,
-//                    suffixIcon: GestureDetector(
-//                      onTap: () {},
-//                      child: Icon(
-//                          Icons.face
-//                      ),
-//                    ),
                   ),
                 ),
                 IconButton(
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   onPressed: () {
-                    if(!showEmojiPicker){
-                      //keyboard is visible
+                    if (!showEmojiPicker) {
+                      // keyboard is visible
                       hideKeyboard();
                       showEmojiContainer();
-                    }else{
+                    } else {
                       //keyboard is hidden
                       showKeyboard();
                       hideEmojiContainer();
                     }
                   },
-                  icon: Icon(
-                    Icons.face
-                  ),
+                  icon: Icon(Icons.face),
                 ),
               ],
             ),
           ),
-          isWriting ? Container() : Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.0),
-            child: Icon(
-                Icons.record_voice_over
-            ),
+          isWriting
+              ? Container()
+              : Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Icon(Icons.record_voice_over),
           ),
-          isWriting ? Container() : GestureDetector(
-            onTap: () => pickCamera(source: ImageSource.camera),
-            child: Icon(
-              Icons.camera_alt
-            ),
+          isWriting
+              ? Container()
+              : GestureDetector(
+            child: Icon(Icons.camera_alt),
+            onTap: () => pickImage(source: ImageSource.camera),
           ),
-          isWriting ? Container(
-            margin: EdgeInsets.only(left: 10.0),
-            decoration: BoxDecoration(
-              gradient: UniversalVariables.fabGradient,
-              shape: BoxShape.circle
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.send,
-                size: 15.0,
-              ),
-              onPressed: () => {
-                sendMessage(),
-              },
-            ),
-          ) : Container(),
+          isWriting
+              ? Container(
+              margin: EdgeInsets.only(left: 10),
+              decoration: BoxDecoration(
+                  gradient: UniversalVariables.fabGradient,
+                  shape: BoxShape.circle),
+              child: IconButton(
+                icon: Icon(
+                  Icons.send,
+                  size: 15,
+                ),
+                onPressed: () => sendMessage(),
+              ))
+              : Container()
         ],
       ),
     );
   }
-  void pickCamera({@required ImageSource source}) async{
+
+  void pickImage({@required ImageSource source}) async {
     File selectedImage = await Utils.pickImage(source: source);
-    _repository.uploadImage(
+    _storageMethods.uploadImage(
         image: selectedImage,
         receiverId: widget.receiver.uid,
         senderId: _currentUserId,
-        imageUploadProvider: _imageUploadProvider
-    );
+        imageUploadProvider: _imageUploadProvider);
   }
 
-  CustomAppBar customAppBar(context){
+  CustomAppBar customAppBar(context) {
     return CustomAppBar(
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back,
-//          color: Colors.white,
         ),
         onPressed: () {
           Navigator.pop(context);
@@ -463,22 +473,23 @@ class _ChatScreenState extends State<ChatScreen> {
       actions: <Widget>[
         IconButton(
           icon: Icon(
-            Icons.video_call
+            Icons.video_call,
           ),
-          onPressed: () {
-            CallUtils.dial(
-              from: sender,
-              to: widget.receiver,
-              context: context
-            );
-          },
+          onPressed: () async =>
+          await Permissions.cameraAndMicrophonePermissionsGranted()
+              ? CallUtils.dial(
+            from: sender,
+            to: widget.receiver,
+            context: context,
+          )
+              : {},
         ),
         IconButton(
           icon: Icon(
-              Icons.phone
+            Icons.phone,
           ),
           onPressed: () {},
-        ),
+        )
       ],
     );
   }
@@ -490,21 +501,27 @@ class ModalTile extends StatelessWidget {
   final IconData icon;
   final Function onTap;
 
-  const ModalTile({@required this.title, @required this.subtitle, @required this.icon,this.onTap});
+  const ModalTile({
+    @required this.title,
+    @required this.subtitle,
+    @required this.icon,
+    this.onTap,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15.0),
+      padding: EdgeInsets.symmetric(horizontal: 15),
       child: CustomTile(
         mini: false,
         onTap: onTap,
         leading: Container(
-          margin: EdgeInsets.only(right: 10.0),
+          margin: EdgeInsets.only(right: 10),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15.0),
+            borderRadius: BorderRadius.circular(15),
             color: UniversalVariables.receiverColor,
           ),
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(10),
           child: Icon(
             icon,
             color: UniversalVariables.greyColor,
@@ -515,7 +532,7 @@ class ModalTile extends StatelessWidget {
           subtitle,
           style: TextStyle(
             color: UniversalVariables.greyColor,
-            fontSize: 14.0
+            fontSize: 14,
           ),
         ),
         title: Text(
@@ -523,7 +540,7 @@ class ModalTile extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            fontSize: 18.0
+            fontSize: 18,
           ),
         ),
       ),

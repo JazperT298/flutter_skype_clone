@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutterskypeclone/models/call.dart';
 import 'package:flutterskypeclone/resources/call_methods.dart';
 import 'package:flutterskypeclone/screens/callscreens/call_screen.dart';
+import 'package:flutterskypeclone/screens/chat_screen/widgets/cached_image.dart';
+import 'package:flutterskypeclone/utils/permissions.dart';
 
 class PickupScreen extends StatelessWidget {
   final Call call;
   final CallMethods callMethods = CallMethods();
 
-  PickupScreen({@required this.call});
+  PickupScreen({
+    @required this.call,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,30 +25,24 @@ class PickupScreen extends StatelessWidget {
             Text(
               "Incoming...",
               style: TextStyle(
-                fontSize: 30.0
+                fontSize: 30,
               ),
             ),
-            SizedBox(
-              height: 50.0,
-            ),
-            Image.network(
+            SizedBox(height: 50),
+            CachedImage(
               call.callerPic,
-              height: 150,
-              width: 150,
+              isRound: true,
+              radius: 180,
             ),
-            SizedBox(
-              height: 15.0,
-            ),
+            SizedBox(height: 15),
             Text(
               call.callerName,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 20.0
+                fontSize: 20,
               ),
             ),
-            SizedBox(
-              height: 75.0,
-            ),
+            SizedBox(height: 75),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -55,13 +53,19 @@ class PickupScreen extends StatelessWidget {
                     await callMethods.endCall(call: call);
                   },
                 ),
-                SizedBox(
-                  width: 25.0,
-                ),
+                SizedBox(width: 25),
                 IconButton(
                   icon: Icon(Icons.call),
                   color: Colors.green,
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CallScreen(call: call))),
+                  onPressed: () async =>
+                  await Permissions.cameraAndMicrophonePermissionsGranted()
+                      ? Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CallScreen(call: call),
+                    ),
+                  )
+                      : {},
                 ),
               ],
             ),

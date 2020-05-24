@@ -1,15 +1,15 @@
 import 'package:flutterskypeclone/models/user.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutterskypeclone/resources/firebase_repository.dart';
+import 'package:flutterskypeclone/resources/auth_methods.dart';
 
-class UserProvider with ChangeNotifier{
+class UserProvider with ChangeNotifier {
   User _user;
-  FirebaseRepository _firebaseRepository = FirebaseRepository();
+  AuthMethods _authMethods = AuthMethods();
 
   User get getUser => _user;
 
   void refreshUser() async {
-    User user = await _firebaseRepository.getUserDetails();
+    User user = await _authMethods.getUserDetails();
     _user = user;
     notifyListeners();
   }

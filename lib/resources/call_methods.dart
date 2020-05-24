@@ -3,9 +3,11 @@ import 'package:flutterskypeclone/constants/strings.dart';
 import 'package:flutterskypeclone/models/call.dart';
 
 class CallMethods {
-  final CollectionReference  callCollection = Firestore.instance.collection(CALL_CONNECTION);
+  final CollectionReference callCollection =
+  Firestore.instance.collection(CALL_COLLECTION);
 
-  Stream<DocumentSnapshot> callStream({String uid}) => callCollection.document(uid).snapshots();
+  Stream<DocumentSnapshot> callStream({String uid}) =>
+      callCollection.document(uid).snapshots();
 
   Future<bool> makeCall({Call call}) async {
     try {
@@ -18,21 +20,20 @@ class CallMethods {
       await callCollection.document(call.callerId).setData(hasDialledMap);
       await callCollection.document(call.receiverId).setData(hasNotDialledMap);
       return true;
-    }catch(e){
-      print(e.toString());
+    } catch (e) {
+      print(e);
       return false;
     }
   }
 
   Future<bool> endCall({Call call}) async {
-    try{
+    try {
       await callCollection.document(call.callerId).delete();
       await callCollection.document(call.receiverId).delete();
       return true;
-    }catch(e){
-      print(e.toString());
+    } catch (e) {
+      print(e);
       return false;
     }
   }
-
 }
