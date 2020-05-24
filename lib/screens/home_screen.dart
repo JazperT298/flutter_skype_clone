@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
       userProvider = Provider.of<UserProvider>(context, listen: false);
       await userProvider.refreshUser();
 
+      //will only execute after refreshUser finishes its execution
       _authMethods.setUserState(
         userId: userProvider.getUser.uid,
         userState: UserState.Online,
