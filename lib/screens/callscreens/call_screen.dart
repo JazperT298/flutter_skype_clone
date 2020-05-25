@@ -36,6 +36,7 @@ class _CallScreenState extends State<CallScreen> {
     super.initState();
     addPostFrameCallback();
     initializeAgora();
+    print(widget.call.channelId);
   }
 
   Future<void> initializeAgora() async {
@@ -65,6 +66,7 @@ class _CallScreenState extends State<CallScreen> {
       callStreamSubscription = callMethods
           .callStream(uid: userProvider.getUser.uid)
           .listen((DocumentSnapshot ds) {
+            print(userProvider.getUser.uid);
         // defining the logic
         switch (ds.data) {
           case null:
@@ -81,12 +83,14 @@ class _CallScreenState extends State<CallScreen> {
 
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
+    print("_initAgoraRtcEngine");
     await AgoraRtcEngine.create(APP_ID);
     await AgoraRtcEngine.enableVideo();
   }
 
   /// Add agora event handlers
   void _addAgoraEventHandlers() {
+    print("_addAgoraEventHandlers");
     AgoraRtcEngine.onError = (dynamic code) {
       setState(() {
         final info = 'onError: $code';
@@ -172,6 +176,7 @@ class _CallScreenState extends State<CallScreen> {
         int height,
         int elapsed,
         ) {
+      print("onFirstRemoteVideoFrame");
       setState(() {
         final info = 'firstRemoteVideo: $uid ${width}x $height';
         _infoStrings.add(info);
