@@ -61,6 +61,14 @@ dependencies:
   # permission handler
   permission_handler: 3.0.0
 
+  # launcher icon
+  flutter_launcher_icons: ^0.7.5
+
+flutter_icons:
+  image_path: "assets/images/chat_logo.png"
+  android: true
+  ios: true
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

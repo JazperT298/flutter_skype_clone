@@ -17,8 +17,8 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="flutterskypeclone"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Yes Chat"
+        android:icon="@mipmap/chat_logo1">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
