@@ -5,7 +5,7 @@ import 'package:flutterskypeclone/provider/user_provider.dart';
 import 'package:flutterskypeclone/resources/auth_methods.dart';
 import 'package:flutterskypeclone/screens/chat_screen/widgets/cached_image.dart';
 import 'package:flutterskypeclone/screens/login_screen.dart';
-import 'package:flutterskypeclone/screens/pageviews/widgets/shimmering_logo.dart';
+import 'package:flutterskypeclone/screens/pageviews/chats/widgets/shimmering_logo.dart';
 import 'package:flutterskypeclone/widgets/appbar.dart';
 import 'package:provider/provider.dart';
 

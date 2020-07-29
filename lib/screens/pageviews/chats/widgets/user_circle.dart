@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterskypeclone/provider/user_provider.dart';
-import 'package:flutterskypeclone/screens/pageviews/widgets/user_details_container.dart';
+import 'package:flutterskypeclone/screens/pageviews/chats/widgets/user_details_container.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:flutterskypeclone/utils/utilities.dart';
 import 'package:provider/provider.dart';

@@ -64,6 +64,13 @@ dependencies:
   # launcher icon
   flutter_launcher_icons: ^0.7.5
 
+  # local storage
+  sqflite: ^1.3.0+1
+  hive: 1.4.1+1
+
+  # intl
+  intl: 0.16.1
+
 flutter_icons:
   image_path: "assets/images/chat_logo.png"
   android: true

@@ -5,7 +5,8 @@ import 'package:flutterskypeclone/enums/user_state.dart';
 import 'package:flutterskypeclone/provider/user_provider.dart';
 import 'package:flutterskypeclone/resources/auth_methods.dart';
 import 'package:flutterskypeclone/screens/callscreens/pickup/pickup_layout.dart';
-import 'package:flutterskypeclone/screens/pageviews/chat_list_screen.dart';
+import 'package:flutterskypeclone/screens/pageviews/logs/log_screen.dart';
+import 'file:///C:/Users/minat/AndroidStudioProjects/flutter_skype_clone/lib/screens/pageviews/chats/chat_list_screen.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:provider/provider.dart';
 class HomeScreen extends StatefulWidget {
@@ -98,10 +99,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
         backgroundColor: UniversalVariables.blackColor,
         body: PageView(
           children: <Widget>[
-            Container(
-              child: ChatListScreen(),
-            ),
-            Center(child: Text("Call Logs",style: TextStyle(color: Colors.white),),),
+            ChatListScreen(),
+            LogScreen(),
             Center(child: Text("Contact Screen",style: TextStyle(color: Colors.white),),),
           ],
           controller: pageController,
