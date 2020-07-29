@@ -13,10 +13,12 @@ import 'package:flutterskypeclone/utils/universal_variables.dart';
 import 'package:flutterskypeclone/utils/utilities.dart';
 import 'package:flutterskypeclone/widgets/appbar.dart';
 import 'package:flutterskypeclone/widgets/custom_tile.dart';
+import 'package:flutterskypeclone/widgets/skype_appbar.dart';
 import 'package:provider/provider.dart';
 
 class ChatListScreen extends StatelessWidget {
   CustomAppBar customAppBar(BuildContext context) {
+    final UserProvider userProvider = Provider.of<UserProvider>(context);
     return CustomAppBar(
       leading: IconButton(
         icon: Icon(
@@ -53,7 +55,27 @@ class ChatListScreen extends StatelessWidget {
     return PickupLayout(
       scaffold: Scaffold(
         backgroundColor: UniversalVariables.blackColor,
-        appBar: customAppBar(context),
+        appBar: SkypeAppBar(
+          title: UserCircle(),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "/search_screen");
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onPressed: () {},
+            ),
+          ],
+        ),
         floatingActionButton: NewChatButton(),
         body: ChatListContainer(),
       ),

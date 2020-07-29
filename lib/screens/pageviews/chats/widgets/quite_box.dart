@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutterskypeclone/screens/search_screen.dart';
 import 'package:flutterskypeclone/utils/universal_variables.dart';
+
+
 class QuietBox extends StatelessWidget {
+  final String heading;
+  final String subtitle;
+
+  QuietBox({
+    @required this.heading,
+    @required this.subtitle,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -15,7 +25,7 @@ class QuietBox extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                "This is where all the contacts are listed",
+                heading,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -24,7 +34,7 @@ class QuietBox extends StatelessWidget {
               ),
               SizedBox(height: 25),
               Text(
-                "Search for your friends and family to start calling or chatting with them",
+                subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   letterSpacing: 1.2,

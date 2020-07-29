@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutterskypeclone/enums/user_state.dart';
 import 'package:flutterskypeclone/provider/user_provider.dart';
 import 'package:flutterskypeclone/resources/auth_methods.dart';
+import 'package:flutterskypeclone/resources/local_db/repository/log_repository.dart';
 import 'package:flutterskypeclone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:flutterskypeclone/screens/pageviews/logs/log_screen.dart';
 import 'file:///C:/Users/minat/AndroidStudioProjects/flutter_skype_clone/lib/screens/pageviews/chats/chat_list_screen.dart';
@@ -32,6 +33,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
       _authMethods.setUserState(
         userId: userProvider.getUser.uid,
         userState: UserState.Online,
+      );
+
+      LogRepository.init(
+        isHive: false,
+        dbName: userProvider.getUser.uid,
       );
     });
 
@@ -138,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                         : UniversalVariables.greyColor,
                   ),
                   title: Text(
-                    "Chats",
+                    "Calls",
                     style: TextStyle(
                       fontSize:_labelFontSize,
                       color: (_page == 1)
@@ -155,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                         : UniversalVariables.greyColor,
                   ),
                   title: Text(
-                    "Chats",
+                    "Contacts",
                     style: TextStyle(
                       fontSize:_labelFontSize,
                       color: (_page == 2)
