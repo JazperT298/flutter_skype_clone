@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutterskypeclone/constants/strings.dart';
 import 'package:flutterskypeclone/models/call.dart';
 import 'package:flutterskypeclone/models/log.dart';
@@ -23,6 +24,25 @@ class _PickupScreenState extends State<PickupScreen> {
   final CallMethods callMethods = CallMethods();
 
   bool isCallMissed = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    callbackDispatcher();
+  }
+  void callbackDispatcher() {
+    print('callbackDispatcher');
+
+    FlutterRingtonePlayer.play(
+      android: AndroidSounds.ringtone,
+      ios: IosSounds.glass,
+      looping: true, // Android only - API >= 28
+      volume: 0.1, // Android only - API >= 28
+      asAlarm: false, // Android only - all APIs
+    );
+  }
+
 
   addToLocalStorage({@required String callStatus}){
     Log log = Log(
@@ -84,6 +104,7 @@ class _PickupScreenState extends State<PickupScreen> {
                   icon: Icon(Icons.call_end),
                   color: Colors.redAccent,
                   onPressed: () async {
+                    FlutterRingtonePlayer.stop();
                     isCallMissed = false;
                     addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
                     await callMethods.endCall(call: widget.call);
@@ -95,6 +116,7 @@ class _PickupScreenState extends State<PickupScreen> {
                   color: Colors.green,
                   onPressed: () async {
                     isCallMissed = false;
+                    FlutterRingtonePlayer.stop();
                     addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
                     await Permissions.cameraAndMicrophonePermissionsGranted()
                         ? Navigator.push(

@@ -9,6 +9,7 @@ import 'package:flutterskypeclone/models/call.dart';
 import 'package:flutterskypeclone/provider/user_provider.dart';
 import 'package:flutterskypeclone/resources/call_methods.dart';
 import 'package:provider/provider.dart';
+import 'package:wakelock/wakelock.dart';
 
 class CallScreen extends StatefulWidget {
   final Call call;
@@ -34,6 +35,7 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
     addPostFrameCallback();
     initializeAgora();
     print(widget.call.channelId);
@@ -366,6 +368,7 @@ class _CallScreenState extends State<CallScreen> {
     AgoraRtcEngine.leaveChannel();
     AgoraRtcEngine.destroy();
     callStreamSubscription.cancel();
+    Wakelock.disable();
     super.dispose();
   }
 

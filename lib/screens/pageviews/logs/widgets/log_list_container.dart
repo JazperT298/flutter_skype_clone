@@ -106,7 +106,7 @@ class _LogListContainerState extends State<LogListContainer> {
                       fontSize: 17,
                     ),
                   ),
-                  //icon: getIcon(_log.callStatus),
+                  icon: getIcon(_log.callStatus),
                   subtitle: Text(
                     Utils.formatDateString(_log.timestamp),
                     style: TextStyle(
