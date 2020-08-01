@@ -15,7 +15,7 @@ class SqliteMethods implements LogInterface{
   String tableName = "Call_Logs";
 
   //columns
-  String logId = 'log_id';
+  String id = 'log_id';
   String callerName = 'caller_name';
   String callerPic = 'caller_pic';
   String receiverName = 'receiver_name';
@@ -43,7 +43,7 @@ class SqliteMethods implements LogInterface{
   }
 
   _onCreate(Database db, int version) async {
-    String createTableQuery = "CREATE TABLE $tableName ($logId INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, "
+    String createTableQuery = "CREATE TABLE $tableName ($id INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, "
         "$receiverName TEXT, $receiverPic TEXT, $callStatus TEXT, $timestamp TEXT)";
 
     await db.execute(createTableQuery);
@@ -59,7 +59,7 @@ class SqliteMethods implements LogInterface{
   @override
   deleteLogs(int logId) async{
     var dbClient = await db;
-    return await dbClient.delete(tableName, where: '$logId = ?', whereArgs: [logId + 1]);
+    return await dbClient.delete(tableName, where: '$id = ?', whereArgs: [logId + 1]);
   }
 
   updateLogs(Log log) async {
@@ -68,7 +68,7 @@ class SqliteMethods implements LogInterface{
     await dbClient.update(
       tableName,
       log.toMap(log),
-      where: '$logId = ?',
+      where: '$id = ?',
       whereArgs: [log.logId],
     );
   }
@@ -82,7 +82,7 @@ class SqliteMethods implements LogInterface{
       List<Map> maps = await dbClient.query(
         tableName,
         columns: [
-          logId,
+          id,
           callerName,
           callerPic,
           receiverName,
